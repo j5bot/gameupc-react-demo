@@ -50,11 +50,13 @@ class UPC_lookup extends React.Component {
     // handleLookup - user clicked the lookup button or hit return on the UPC field
     //   Request the UPC data from gameupc.com and send the response to be evaluated
     //
-    handleLookup(event) {
+    handleLookup(event, isScanned) {
         // Do the initial fetch of data for the UPC and send it on to the LookupResult,
         //    which is where the "are we done" logic sits
         const upc = this.upcField.value;
-        this.setState({'upc' : upc });
+        if (isScanned) {
+            this.setState({'upc' : upc });
+        }
         this.lookupResult.setState({'gameupc_data' : null, 'working' : true, voted: false})
         fetch( HOST + "upc/" + upc + "?search_mode=quality", {headers: API_HEADERS}).then(res => res.json())
             .then((result) => {
@@ -85,7 +87,7 @@ class UPC_lookup extends React.Component {
                 <form onSubmit={(e) => this.handleLookup(e)}>
                     <Scanner onScan={(code) => {
                         this.upcField = { value: code };
-                        this.handleLookup({preventDefault: () => undefined})
+                        this.handleLookup({preventDefault: () => undefined}, true)
                     }} />
                     {/* Input UPC */}
                     <FormGroup>
@@ -95,14 +97,17 @@ class UPC_lookup extends React.Component {
                             label="UPC"
                             helperText="Normally, you would use the platform's bar code scanner APIs to find the UPC, and not show an editable field to the user"
                             autoFocus/>
-                        <TextField
-                            value={this.state?.upc}
-                            label="Scanned UPC" />
-                        <br/>
                     </FormGroup>
 
                     <FormGroup>
                         <Button variant="contained" color="primary" type="submit">Lookup</Button>
+                    </FormGroup>
+
+                    <FormGroup>
+                        <TextField
+                            value={this.state?.upc}
+                            label="Scanned UPC" />
+                        <br/>
                     </FormGroup>
                 </form>
 

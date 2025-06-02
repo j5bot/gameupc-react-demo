@@ -26,7 +26,7 @@ function game_found(bgg_info) {
 //
 // The general flow of a UPC lookup follows these steps:
 // * Warmup the API
-// * Reques the UPC data
+// * Request the UPC data
 // * Until we have a bgg_info_status == 'verified' (validated result) result:
 //   + Prompt the user with our search terms and suggested alternatives
 //   + If they choose an alternative, post the results; the reponse should have a bgg_info_status == 'verified' field
@@ -38,6 +38,10 @@ function game_found(bgg_info) {
 //    by the camera and UPC recognition code on your app
 //
 class UPC_lookup extends React.Component {
+    constructor (props) {
+        super(props);
+        this.state = {upc: undefined};
+    }
     //////////////////////////////////
     //  Events
     //////////////////////////////////
@@ -50,7 +54,7 @@ class UPC_lookup extends React.Component {
         // Do the initial fetch of data for the UPC and send it on to the LookupResult,
         //    which is where the "are we done" logic sits
         const upc = this.upcField.value;
-
+        this.setState({'upc' : upc });
         this.lookupResult.setState({'gameupc_data' : null, 'working' : true, voted: false})
         fetch( HOST + "upc/" + upc + "?search_mode=quality", {headers: API_HEADERS}).then(res => res.json())
             .then((result) => {
@@ -91,6 +95,9 @@ class UPC_lookup extends React.Component {
                             label="UPC"
                             helperText="Normally, you would use the platform's bar code scanner APIs to find the UPC, and not show an editable field to the user"
                             autoFocus/>
+                        <TextField
+                            value={this.state?.upc}
+                            label="Scanned UPC" />
                         <br/>
                     </FormGroup>
 
